@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Discord Watch Deleted Messages
 // @version      1.0.0
-// @license      GNU AGPLv3
+// @license      GPL-3.0-or-later; https://www.gnu.org/licenses/gpl-3.0.txt
 // @author       toolzmaker
 // @description  Records all deleted messages in every opened channel and stores them so you can read it later ;)
 // @homepageURL  https://discord.gg/BJTk6get7H
