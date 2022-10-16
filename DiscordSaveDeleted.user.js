@@ -7,7 +7,7 @@
 // @homepageURL  https://discord.gg/BJTk6get7H
 // @match        *://discordapp.com/*
 // @match        *://discord.com/*
-// @updateURL    https://openuserjs.org/meta/toolzmaker/DiscordSaveDeleted.meta.js
+// @downloadURL  https://github.com/toolzmaker/DiscordSaveDeleted/raw/main/DiscordSaveDeleted.user.js
 // ==/UserScript==
 
 
