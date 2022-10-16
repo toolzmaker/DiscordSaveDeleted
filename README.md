@@ -1,7 +1,7 @@
 # DiscordSaveDeleted
 Watches every deleted message in every discord-channel you have opened, and saves them to your browser localStorage(it lasts even after reboot).<br/>
 <img src="https://i.imgur.com/mevO18t.png"><br/>
-Trashcan icon with an arrow opens Deleted Messages Window. It contains a list of deleted messages of active channel
+Trashcan icon with an arrow in the right upper corner of Discord window opens Deleted messages list. It contains a list of deleted messages of active channel<br/>
 To resize that window move your cursor to the right bottom corner of it.<br/>
 <img src="https://i.imgur.com/jUr3gxc.gif"><br/>
 You can delete every message from memory by clicking [X] button.<br/>
