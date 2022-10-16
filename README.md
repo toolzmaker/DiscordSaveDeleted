@@ -3,8 +3,7 @@ Watches every deleted message in every discord-channel you have opened, and save
 <img src="https://i.imgur.com/mevO18t.png"><br/>
 Trashcan icon with an arrow in the right upper corner of Discord window opens Deleted messages list. It contains a list of deleted messages of active channel<br/>
 To resize that window move your cursor to the right bottom corner of it.<br/>
-<img src="https://i.imgur.com/jUr3gxc.gif"><br/>
-(this video has a small mistake - extension icon is in UPPER right corner, not bottom)<br/>
+<img src="[https://i.imgur.com/jUr3gxc.gif](https://i.imgur.com/VPjrXGb.gif)"><br/>
 You can delete every message from memory by clicking [X] button.<br/>
 To record several channels, just open a new browser tab with needed channel and make sure this script is working.<br/>
 You can switch between channels and every channel will show its deleted messages storage.<br/>
