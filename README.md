@@ -1,4 +1,6 @@
 # DiscordSaveDeleted
+[<img src="https://user-images.githubusercontent.com/3372598/166113712-1bc3d654-1342-4f1e-9845-21c3b21524b1.png">](https://greasyfork.org/en/scripts/453176-discord-watch-deleted-messages)<br/>
+
 Watches every deleted message in every discord-channel you have opened, and saves them to your browser localStorage<br/>(it lasts even after reboot).<br/>
 <img src="https://i.imgur.com/mevO18t.png"><br/>
 Trashcan icon with an arrow in the right upper corner of Discord window opens Deleted messages list. It contains a list of deleted messages of active channel<br/>
@@ -12,3 +14,4 @@ Make sure you enabled auto-update in your userscript settings, so you can get la
 Discussion:<br/>
 Discord: <a>https://discord.gg/BJTk6get7H</a><br/>
 Telegram: <a>https://t.me/toolz_maker</a>
+
