@@ -11,6 +11,8 @@ You can switch between channels and every channel will show its deleted messages
 You can delete every message from memory by clicking [X] button.<br/>
 Make sure you enabled auto-update in your userscript settings, so you can get later versions.<br/><br/>
 
+You need browser addon for userscripts to work: Tampermonkey (Chrome) or Greasemonkey (Firefox) or Violentmonkey.
+
 Discussion:<br/>
 Discord: <a>https://discord.gg/BJTk6get7H</a><br/>
 Telegram: <a>https://t.me/toolz_maker</a>
