@@ -455,13 +455,14 @@
                     if (delmsglist) {
                         let id_curtimestamp = 'delmsg' + Date.now();
                         let new_delnode = removed_node.querySelector('[id*="message-content-"]');
+                        let delnode_imgs = removed_node.querySelector('[id*="message-accessories-"]'); //if message has images and other accessories
                         let msg_time_node = removed_node.querySelector('[id*="message-timestamp-"]');
                         let msg_time_text = msg_time_node.getAttribute('datetime');
                         //delmsg_time = msg_time_node.textContent;
                         const mregex = /^20(\d{2})-(\d{2})-(\d{2})T(.+):.+Z/i;
                         delmsg_time = msg_time_text.replace(mregex, '$4 $3/$2/$1');
                         /// ADD NEW ITEM TO DELMSGS LIST /////////////
-                        let new_html = '<div id="' + id_curtimestamp + '" class="right-onhover-btn" style="position:absolute;">X</div> <b>' + delmsg_usrname + '</b> (' + delmsg_time + ') <br /> ' + new_delnode.innerHTML;// + msgs_underline;
+                        let new_html = '<div id="' + id_curtimestamp + '" class="right-onhover-btn" style="position:absolute;">X</div> <b>' + delmsg_usrname + '</b> (' + delmsg_time + ') <br /> ' + new_delnode.innerHTML + delnode_imgs.outerHTML;// + msgs_underline;
                         new_delnode.innerHTML = new_html;
                         new_delnode.classList.add("delmsgborder");
                         delmsglist.appendChild(new_delnode);
