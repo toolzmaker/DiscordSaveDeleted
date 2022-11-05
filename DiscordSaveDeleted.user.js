@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Discord Watch Deleted Messages
-// @version      1.0.2
+// @version      1.0.3
 // @license      GPL-3.0-or-later; https://www.gnu.org/licenses/gpl-3.0.txt
 // @author       toolzmaker
 // @description  Records all deleted messages in every opened channel and stores them so you can read it later ;)
@@ -354,6 +354,11 @@
             window.localStorage.setItem(local_storage_name, JSON.stringify(var_parsed));
         }
     }
+    
+    function extra_change_message(msg_str) {
+        const spoiler_regex = /(spoilerText-\w+ )(hidden-[-\w]+)/ig;
+        return msg_str.replace(spoiler_regex, '$1'); /// UNHIDE SPOILER MESSAGES
+    }
 
     function check_channel_change() {
         let cur_chan = location.pathname.substr(location.pathname.indexOf(path_find_str) + path_find_str.length);
@@ -373,7 +378,10 @@
             }
             if (var_parsed[cur_chan]) {
                 (var_parsed[cur_chan]).forEach(del_record => { // ADD MESSAGE FROM STORED MEMORY
-                    delmsglist.innerHTML = delmsglist.innerHTML + del_record;
+                    /// UNHIDE SPOILER MESSAGES
+                    const spoiler_regex = /(spoilerText-\w+ )(hidden-[-\w]+)/ig;
+                    del_record = del_record.replace(spoiler_regex, '$1'); ///
+                    delmsglist.innerHTML = delmsglist.innerHTML + extra_change_message(del_record);
                     delmsgs_count += 1;
                 });
                 const closeButtons = delmsglist.querySelectorAll('[id*="delmsg"]');
@@ -463,7 +471,7 @@
                         delmsg_time = msg_time_text.replace(mregex, '$4 $3/$2/$1');
                         /// ADD NEW ITEM TO DELMSGS LIST /////////////
                         let new_html = '<div id="' + id_curtimestamp + '" class="right-onhover-btn" style="position:absolute;">X</div> <b>' + delmsg_usrname + '</b> (' + delmsg_time + ') <br /> ' + new_delnode.innerHTML + delnode_imgs.outerHTML;// + msgs_underline;
-                        new_delnode.innerHTML = new_html;
+                        new_delnode.innerHTML = extra_change_message(new_html);
                         new_delnode.classList.add("delmsgborder");
                         delmsglist.appendChild(new_delnode);
                         //delmsglist.innerHTML = delmsglist.innerHTML + msgs_underline;
