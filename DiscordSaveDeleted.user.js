@@ -354,7 +354,7 @@
             window.localStorage.setItem(local_storage_name, JSON.stringify(var_parsed));
         }
     }
-    
+
     function extra_change_message(msg_str) {
         const spoiler_regex = /(spoilerText-\w+ )(hidden-[-\w]+)/ig;
         return msg_str.replace(spoiler_regex, '$1'); /// UNHIDE SPOILER MESSAGES
@@ -417,14 +417,18 @@
                     }
                 }
 
-                if ((removed_node.tagName == 'LI') && !removed_node.querySelector('[class*="isSending-"]') && (removed_node.querySelector('[class^="markup-"]'))) {
+                if ((removed_node.tagName === 'LI' || removed_node.tagName === 'DIV') && !removed_node.querySelector('[class*="isSending-"]') && (removed_node.querySelector('[class^="markup-"]'))) {
 
+                    // because we allow divs, we need to filter out divs that are not just chat deletes
+                    if (!isChatDelete(removed_node)) {
+                        return;
+                    }
                     let prevCount = 0;
                     let prevNode = mutation.previousSibling;
                     let olCount = 0; // OL child elements count
 
                     if (prevNode) {
-                        if (prevNode.parentNode.tagName == 'OL') {
+                        if (prevNode.parentNode.tagName === 'OL') {
                             olCount = prevNode.parentNode.childElementCount;
 
                         }
@@ -443,11 +447,11 @@
                     let delmsg_usrname = ''; // Nickname of deleted msg
                     let delmsg_time = ''; // time of deleted msg
 
-                    if (!(removed_node.querySelector('[class*="username-"]'))) {
+                    if (!(getUsername(removed_node))) {
                         let findNode = mutation.previousSibling;
                         let usrnameNode = false;
                         while (findNode) {
-                            usrnameNode = findNode.querySelector('[class*="username-"]');
+                            usrnameNode = getUsername(findNode, true);
                             if (usrnameNode) {
                                 break;
                             }
@@ -457,15 +461,16 @@
                             delmsg_usrname = usrnameNode.textContent; // Nickname of deleted msg
                         }
                     } else { // if deleted message has nickname in it
-                        delmsg_usrname = removed_node.querySelector('[class*="username-"]').textContent;
+                        delmsg_usrname = getUsername(removed_node)
                     }
 
                     if (delmsglist) {
                         let id_curtimestamp = 'delmsg' + Date.now();
-                        let new_delnode = removed_node.querySelector('[id*="message-content-"]');
+                        const contentElements = removed_node.querySelectorAll('[id*="message-content-"]');
+                        let new_delnode = [...contentElements].find(el => !el.className.includes("repliedTextContent"));
                         let delnode_imgs = removed_node.querySelector('[id*="message-accessories-"]'); //if message has images and other accessories
                         let msg_time_node = removed_node.querySelector('[id*="message-timestamp-"]');
-                        let msg_time_text = msg_time_node.getAttribute('datetime');
+                        let msg_time_text = msg_time_node.getAttribute('datetime') ?? "N/A";
                         //delmsg_time = msg_time_node.textContent;
                         const mregex = /^20(\d{2})-(\d{2})-(\d{2})T(.+):.+Z/i;
                         delmsg_time = msg_time_text.replace(mregex, '$4 $3/$2/$1');
@@ -490,6 +495,38 @@
                 }
             });
         });
+
+        function getUsername(node, asNode = false) {
+            const usernameNode = [...node.querySelectorAll('[class*="username-"]')].find(el => el.closest(`[id^='message-reply-context']`) === null) ?? null;
+            if (!usernameNode) {
+                return null;
+            }
+            return asNode ? usernameNode : usernameNode.textContent;
+        }
+
+        /**
+         * Return true only if this delete refers to a removed message initiated by a user
+         * @param node
+         * @returns {boolean}
+         */
+        function isChatDelete(node) {
+            // ensure we-wrapped message element (li -> div) when clicked on a reply link is removed
+            const messageId = node.id.split("-").pop();
+            const messageContent = document.querySelector(`#message-content-${messageId}`);
+            if (messageContent) {
+                // ignore modals
+                const popup = messageContent?.closest(`[class^="focusLock"]`) ?? null;
+                if (!popup) {
+                    return false;
+                }
+            }
+            // ignore div tags removed from uploads finished
+            if (node.querySelector(`[class^="progressContainer"]`) !== null) {
+                return false;
+            }
+            return true;
+        }
+
     }
 
     function init(observerInit) {
