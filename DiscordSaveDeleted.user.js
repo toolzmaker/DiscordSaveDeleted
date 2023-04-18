@@ -14,208 +14,207 @@
 (function () {
 
     /////////////////////CLASS FOR DRAG AND RESIZE WITHOUT JQUERY//////////////////////////////////
-    class Drag {
-        /**
-         * Make an element draggable/resizable
-         * @param {Element} targetElm The element that will be dragged/resized
-         * @param {Element} handleElm The element that will listen to events (handdle/grabber)
-         * @param {object} [options] Options
-         * @param {string} [options.mode="move"] Define the type of operation (move/resize)
-         * @param {number} [options.minWidth=200] Minimum width allowed to resize
-         * @param {number} [options.maxWidth=Infinity] Maximum width allowed to resize
-         * @param {number} [options.minHeight=100] Maximum height allowed to resize
-         * @param {number} [options.maxHeight=Infinity] Maximum height allowed to resize
-         * @param {string} [options.draggingClass="drag"] Class added to targetElm while being dragged
-         * @param {boolean} [options.useMouseEvents=true] Use mouse events
-         * @param {boolean} [options.useTouchEvents=true] Use touch events
-         *
-         * @author Victor N. wwww.vitim.us
-         */
-        constructor(targetElm, handleElm, options) {
-            this.options = Object.assign({
-                mode: 'move',
+      class Drag {
+    /**
+       * Make an element draggable/resizable
+       * @param {Element} targetElm The element that will be dragged/resized
+       * @param {Element} handleElm The element that will listen to events (handdle/grabber)
+       * @param {object} [options] Options
+       * @param {string} [options.mode="move"] Define the type of operation (move/resize)
+       * @param {number} [options.minWidth=200] Minimum width allowed to resize
+       * @param {number} [options.maxWidth=Infinity] Maximum width allowed to resize
+       * @param {number} [options.minHeight=100] Maximum height allowed to resize
+       * @param {number} [options.maxHeight=Infinity] Maximum height allowed to resize
+       * @param {string} [options.draggingClass="drag"] Class added to targetElm while being dragged
+       * @param {boolean} [options.useMouseEvents=true] Use mouse events
+       * @param {boolean} [options.useTouchEvents=true] Use touch events
+       *
+       * @author Victor N. wwww.vitim.us
+       */
+    constructor(targetElm, handleElm, options) {
+      this.options = Object.assign({
+        mode: 'move',
 
-                minWidth: 200,
-                maxWidth: Infinity,
-                minHeight: 100,
-                maxHeight: Infinity,
-                xAxis: true,
-                yAxis: true,
+        minWidth: 200,
+        maxWidth: Infinity,
+        minHeight: 100,
+        maxHeight: Infinity,
+        xAxis: true,
+        yAxis: true,
 
-                draggingClass: 'drag',
+        draggingClass: 'drag',
 
-                useMouseEvents: true,
-                useTouchEvents: true,
-            }, options);
+        useMouseEvents: true,
+        useTouchEvents: true,
+      }, options);
 
-            // Public properties
-            this.minWidth = this.options.minWidth;
-            this.maxWidth = this.options.maxWidth;
-            this.minHeight = this.options.minHeight;
-            this.maxHeight = this.options.maxHeight;
-            this.xAxis = this.options.xAxis;
-            this.yAxis = this.options.yAxis;
-            this.draggingClass = this.options.draggingClass;
+      // Public properties
+      this.minWidth = this.options.minWidth;
+      this.maxWidth = this.options.maxWidth;
+      this.minHeight = this.options.minHeight;
+      this.maxHeight = this.options.maxHeight;
+      this.xAxis = this.options.xAxis;
+      this.yAxis = this.options.yAxis;
+      this.draggingClass = this.options.draggingClass;
 
-            /** @private */
-            this._targetElm = targetElm;
-            /** @private */
-            this._handleElm = handleElm;
+      /** @private */
+      this._targetElm = targetElm;
+      /** @private */
+      this._handleElm = handleElm;
 
-            const moveOp = (x, y) => {
-                let l = x - offLeft;
-                if (x - offLeft < 0) l = 0; //offscreen <-
-                else if (x - offRight > vw) l = vw - this._targetElm.clientWidth; //offscreen ->
-                let t = y - offTop;
-                if (y - offTop < 0) t = 0; //offscreen /\
-                else if (y - offBottom > vh) t = vh - this._targetElm.clientHeight; //offscreen \/
+      const moveOp = (x, y) => {
+        let l = x - offLeft;
+        if (x - offLeft < 0) l = 0; //offscreen <-
+        else if (x - offRight > vw) l = vw - this._targetElm.clientWidth; //offscreen ->
+        let t = y - offTop;
+        if (y - offTop < 0) t = 0; //offscreen /\
+        else if (y - offBottom > vh) t = vh - this._targetElm.clientHeight; //offscreen \/
 
-                if (this.xAxis) this._targetElm.style.left = `${l}px`;
-                if (this.yAxis) this._targetElm.style.top = `${t}px`;
-                // NOTE: profilling on chrome translate wasn't faster than top/left as expected. And it also permanently creates a new layer, increasing vram usage.
-                // this._targetElm.style.transform = `translate(${l}px, ${t}px)`;
-            };
+        if(this.xAxis) this._targetElm.style.left = `${l}px`;
+        if(this.yAxis) this._targetElm.style.top = `${t}px`;
+        // NOTE: profilling on chrome translate wasn't faster than top/left as expected. And it also permanently creates a new layer, increasing vram usage.
+        // this._targetElm.style.transform = `translate(${l}px, ${t}px)`;
+      };
 
-            const resizeOp = (x, y) => {
-                let w = x - this._targetElm.offsetLeft - offRight;
-                if (x - offRight > vw) w = Math.min(vw - this._targetElm.offsetLeft, this.maxWidth); //offscreen ->
-                else if (x - offRight - this._targetElm.offsetLeft > this.maxWidth) w = this.maxWidth; //max width
-                else if (x - offRight - this._targetElm.offsetLeft < this.minWidth) w = this.minWidth; //min width
-                let h = y - this._targetElm.offsetTop - offBottom;
-                if (y - offBottom > vh) h = Math.min(vh - this._targetElm.offsetTop, this.maxHeight); //offscreen \/
-                else if (y - offBottom - this._targetElm.offsetTop > this.maxHeight) h = this.maxHeight; //max height
-                else if (y - offBottom - this._targetElm.offsetTop < this.minHeight) h = this.minHeight; //min height
+      const resizeOp = (x, y) => {
+        let w = x - this._targetElm.offsetLeft - offRight;
+        if (x - offRight > vw) w = Math.min(vw - this._targetElm.offsetLeft, this.maxWidth); //offscreen ->
+        else if (x - offRight - this._targetElm.offsetLeft > this.maxWidth) w = this.maxWidth; //max width
+        else if (x - offRight - this._targetElm.offsetLeft < this.minWidth) w = this.minWidth; //min width
+        let h = y - this._targetElm.offsetTop - offBottom;
+        if (y - offBottom > vh) h = Math.min(vh - this._targetElm.offsetTop, this.maxHeight); //offscreen \/
+        else if (y - offBottom - this._targetElm.offsetTop > this.maxHeight) h = this.maxHeight; //max height
+        else if (y - offBottom - this._targetElm.offsetTop < this.minHeight) h = this.minHeight; //min height
 
-                if (this.xAxis) this._targetElm.style.width = `${w}px`;
-                if (this.yAxis) this._targetElm.style.height = `${h}px`;
-            };
+        if(this.xAxis) this._targetElm.style.width = `${w}px`;
+        if(this.yAxis) this._targetElm.style.height = `${h}px`;
+      };
 
-            // define which operation is performed on drag
-            const operation = this.options.mode === 'move' ? moveOp : resizeOp;
+      // define which operation is performed on drag
+      const operation = this.options.mode === 'move' ? moveOp : resizeOp;
 
-            // offset from the initial click to the target boundaries
-            let offTop, offLeft, offBottom, offRight;
+      // offset from the initial click to the target boundaries
+      let offTop, offLeft, offBottom, offRight;
 
-            let vw = window.innerWidth;
-            let vh = window.innerHeight;
+      let vw = window.innerWidth;
+      let vh = window.innerHeight;
 
 
-            function dragStartHandler(e) {
-                const touch = e.type === 'touchstart';
+      function dragStartHandler(e) {
+        const touch = e.type === 'touchstart';
 
-                if ((e.buttons === 1 || e.which === 1) || touch) {
-                    e.preventDefault();
+        if ((e.buttons === 1 || e.which === 1) || touch) {
+          e.preventDefault();
 
-                    const x = touch ? e.touches[0].clientX : e.clientX;
-                    const y = touch ? e.touches[0].clientY : e.clientY;
+          const x = touch ? e.touches[0].clientX : e.clientX;
+          const y = touch ? e.touches[0].clientY : e.clientY;
 
-                    const targetOffset = this._targetElm.getBoundingClientRect();
+          const targetOffset = this._targetElm.getBoundingClientRect();
 
-                    //offset from the click to the top-left corner of the target (drag)
-                    offTop = y - targetOffset.y;
-                    offLeft = x - targetOffset.x;
-                    //offset from the click to the bottom-right corner of the target (resize)
-                    offBottom = y - (targetOffset.y + targetOffset.height);
-                    offRight = x - (targetOffset.x + targetOffset.width);
+          //offset from the click to the top-left corner of the target (drag)
+          offTop = y - targetOffset.y;
+          offLeft = x - targetOffset.x;
+          //offset from the click to the bottom-right corner of the target (resize)
+          offBottom = y - (targetOffset.y + targetOffset.height);
+          offRight = x - (targetOffset.x + targetOffset.width);
 
-                    vw = window.innerWidth;
-                    vh = window.innerHeight;
+          vw = window.innerWidth;
+          vh = window.innerHeight;
 
-                    if (this.options.useMouseEvents) {
-                        document.addEventListener('mousemove', this._dragMoveHandler);
-                        document.addEventListener('mouseup', this._dragEndHandler);
-                    }
-                    if (this.options.useTouchEvents) {
-                        document.addEventListener('touchmove', this._dragMoveHandler, {
-                            passive: false,
-                        });
-                        document.addEventListener('touchend', this._dragEndHandler);
-                    }
+          if (this.options.useMouseEvents) {
+            document.addEventListener('mousemove', this._dragMoveHandler);
+            document.addEventListener('mouseup', this._dragEndHandler);
+          }
+          if (this.options.useTouchEvents) {
+            document.addEventListener('touchmove', this._dragMoveHandler, {
+              passive: false,
+            });
+            document.addEventListener('touchend', this._dragEndHandler);
+          }
 
-                    this._targetElm.classList.add(this.draggingClass);
-                }
-            }
+          this._targetElm.classList.add(this.draggingClass);
+        }
+      }
 
-            function dragMoveHandler(e) {
-                e.preventDefault();
-                let x, y;
+      function dragMoveHandler(e) {
+        e.preventDefault();
+        let x, y;
 
-                const touch = e.type === 'touchmove';
-                if (touch) {
-                    const t = e.touches[0];
-                    x = t.clientX;
-                    y = t.clientY;
-                } else { //mouse
+        const touch = e.type === 'touchmove';
+        if (touch) {
+          const t = e.touches[0];
+          x = t.clientX;
+          y = t.clientY;
+        } else { //mouse
 
-                    // If the button is not down, dispatch a "fake" mouse up event, to stop listening to mousemove
-                    // This happens when the mouseup is not captured (outside the browser)
-                    if ((e.buttons || e.which) !== 1) {
-                        this._dragEndHandler();
-                        return;
-                    }
+          // If the button is not down, dispatch a "fake" mouse up event, to stop listening to mousemove
+          // This happens when the mouseup is not captured (outside the browser)
+          if ((e.buttons || e.which) !== 1) {
+            this._dragEndHandler();
+            return;
+          }
 
-                    x = e.clientX;
-                    y = e.clientY;
-                }
-
-                operation(x, y);
-            }
-
-            function dragEndHandler(e) {
-                if (this.options.useMouseEvents) {
-                    document.removeEventListener('mousemove', this._dragMoveHandler);
-                    document.removeEventListener('mouseup', this._dragEndHandler);
-                }
-                if (this.options.useTouchEvents) {
-                    document.removeEventListener('touchmove', this._dragMoveHandler);
-                    document.removeEventListener('touchend', this._dragEndHandler);
-                }
-                this._targetElm.classList.remove(this.draggingClass);
-            }
-
-            // We need to bind the handlers to this instance and expose them to methods enable and destroy
-            /** @private */
-            this._dragStartHandler = dragStartHandler.bind(this);
-            /** @private */
-            this._dragMoveHandler = dragMoveHandler.bind(this);
-            /** @private */
-            this._dragEndHandler = dragEndHandler.bind(this);
-
-            this.enable();
+          x = e.clientX;
+          y = e.clientY;
         }
 
-        /**
-         * Turn on the drag and drop of the instancea
-         * @memberOf Drag
-         */
-        enable() {
-            // this.destroy(); // prevent events from getting binded twice
-            if (this.options.useMouseEvents) this._handleElm.addEventListener('mousedown', this._dragStartHandler);
-            if (this.options.useTouchEvents) this._handleElm.addEventListener('touchstart', this._dragStartHandler, {passive: false});
-        }
+        operation(x, y);
+      }
 
-        /**
-         * Teardown all events bound to the document and elements
-         * You can resurrect this instance by calling enable()
-         * @memberOf Drag
-         */
-        destroy() {
-            this._targetElm.classList.remove(this.draggingClass);
-
-            if (this.options.useMouseEvents) {
-                this._handleElm.removeEventListener('mousedown', this._dragStartHandler);
-                document.removeEventListener('mousemove', this._dragMoveHandler);
-                document.removeEventListener('mouseup', this._dragEndHandler);
-            }
-            if (this.options.useTouchEvents) {
-                this._handleElm.removeEventListener('touchstart', this._dragStartHandler);
-                document.removeEventListener('touchmove', this._dragMoveHandler);
-                document.removeEventListener('touchend', this._dragEndHandler);
-            }
+      function dragEndHandler(e) {
+        if (this.options.useMouseEvents) {
+          document.removeEventListener('mousemove', this._dragMoveHandler);
+          document.removeEventListener('mouseup', this._dragEndHandler);
         }
+        if (this.options.useTouchEvents) {
+          document.removeEventListener('touchmove', this._dragMoveHandler);
+          document.removeEventListener('touchend', this._dragEndHandler);
+        }
+        this._targetElm.classList.remove(this.draggingClass);
+      }
+
+      // We need to bind the handlers to this instance and expose them to methods enable and destroy
+      /** @private */
+      this._dragStartHandler = dragStartHandler.bind(this);
+      /** @private */
+      this._dragMoveHandler = dragMoveHandler.bind(this);
+      /** @private */
+      this._dragEndHandler = dragEndHandler.bind(this);
+
+      this.enable();
     }
 
+    /**
+     * Turn on the drag and drop of the instancea
+     * @memberOf Drag
+     */
+    enable() {
+      // this.destroy(); // prevent events from getting binded twice
+      if (this.options.useMouseEvents) this._handleElm.addEventListener('mousedown', this._dragStartHandler);
+      if (this.options.useTouchEvents) this._handleElm.addEventListener('touchstart', this._dragStartHandler, { passive: false });
+    }
+    /**
+     * Teardown all events bound to the document and elements
+     * You can resurrect this instance by calling enable()
+     * @memberOf Drag
+     */
+    destroy() {
+      this._targetElm.classList.remove(this.draggingClass);
+
+      if (this.options.useMouseEvents) {
+        this._handleElm.removeEventListener('mousedown', this._dragStartHandler);
+        document.removeEventListener('mousemove', this._dragMoveHandler);
+        document.removeEventListener('mouseup', this._dragEndHandler);
+      }
+      if (this.options.useTouchEvents) {
+        this._handleElm.removeEventListener('touchstart', this._dragStartHandler);
+        document.removeEventListener('touchmove', this._dragMoveHandler);
+        document.removeEventListener('touchend', this._dragEndHandler);
+      }
+    }
+  }
     ///////////////////CLASS FOR DRAG AND RESIZE WITHOUT JQUERY////////////////////////////////////
+
 
 
     //////////RESTORING LOCALSTORAGE IN DISCORD//////////////
@@ -255,7 +254,6 @@
         document.head.appendChild(style);
         return style;
     }
-
     insertCss(newStyles);
     //////////ADD NEW STYLES///////////////////////////
 
@@ -347,15 +345,16 @@
             window.localStorage.setItem(local_storage_name, JSON.stringify(newItem));
         } else {
             let var_parsed = JSON.parse(window.localStorage.getItem(local_storage_name));
-            if (!(channel_path in var_parsed)) {
+            if(!(channel_path in var_parsed)) {
                 var_parsed[channel_path] = [strng];
-            } else {
+            }
+            else {
                 var_parsed[channel_path].push(strng);
             }
             window.localStorage.setItem(local_storage_name, JSON.stringify(var_parsed));
         }
     }
-
+    
     function extra_change_message(msg_str) {
         const spoiler_regex = /(spoilerText-\w+ )(hidden-[-\w]+)/ig;
         return msg_str.replace(spoiler_regex, '$1'); /// UNHIDE SPOILER MESSAGES
@@ -373,7 +372,7 @@
             ///SWITCHING CHANNELS, GETS DATA FROM LOCALSTORAGE
             let var_parsed = JSON.parse(window.localStorage.getItem(local_storage_name));
             let channel_name = document.body.querySelector('h1[class*="heading-"]').textContent /// Считывает название канала Channel Name
-            let border_name = savedeletedWindow.querySelector('[id*="DELMSGS_BORDER"]');
+                let border_name = savedeletedWindow.querySelector('[id*="DELMSGS_BORDER"]');
             if (border_name) {
                 border_name.innerHTML = 'Deleted in <b>' + channel_name + '</b>';
             }
@@ -418,18 +417,14 @@
                     }
                 }
 
-                if ((removed_node.tagName === 'LI' || removed_node.tagName === 'DIV') && !removed_node.querySelector('[class*="isSending-"]') && (removed_node.querySelector('[class^="markup-"]'))) {
+                if ((removed_node.tagName == 'LI') && !removed_node.querySelector('[class*="isSending-"]') && (removed_node.querySelector('[class^="markup-"]'))) {
 
-                    // because we allow divs, we need to filter out divs that are not just chat deletes
-                    if (!isChatDelete(removed_node)) {
-                        return;
-                    }
                     let prevCount = 0;
                     let prevNode = mutation.previousSibling;
                     let olCount = 0; // OL child elements count
 
                     if (prevNode) {
-                        if (prevNode.parentNode.tagName === 'OL') {
+                        if (prevNode.parentNode.tagName == 'OL') {
                             olCount = prevNode.parentNode.childElementCount;
 
                         }
@@ -448,11 +443,11 @@
                     let delmsg_usrname = ''; // Nickname of deleted msg
                     let delmsg_time = ''; // time of deleted msg
 
-                    if (!(getUsername(removed_node))) {
+                    if (!(removed_node.querySelector('[class*="username-"]'))) {
                         let findNode = mutation.previousSibling;
                         let usrnameNode = false;
                         while (findNode) {
-                            usrnameNode = getUsername(findNode, true);
+                            usrnameNode = findNode.querySelector('[class*="username-"]');
                             if (usrnameNode) {
                                 break;
                             }
@@ -462,16 +457,15 @@
                             delmsg_usrname = usrnameNode.textContent; // Nickname of deleted msg
                         }
                     } else { // if deleted message has nickname in it
-                        delmsg_usrname = getUsername(removed_node)
+                        delmsg_usrname = removed_node.querySelector('[class*="username-"]').textContent;
                     }
 
                     if (delmsglist) {
                         let id_curtimestamp = 'delmsg' + Date.now();
-                        const contentElements = removed_node.querySelectorAll('[id*="message-content-"]');
-                        let new_delnode = [...contentElements].find(el => !el.className.includes("repliedTextContent"));
+                        let new_delnode = removed_node.querySelector('[id*="message-content-"]');
                         let delnode_imgs = removed_node.querySelector('[id*="message-accessories-"]'); //if message has images and other accessories
                         let msg_time_node = removed_node.querySelector('[id*="message-timestamp-"]');
-                        let msg_time_text = msg_time_node.getAttribute('datetime') ?? "N/A";
+                        let msg_time_text = msg_time_node.getAttribute('datetime');
                         //delmsg_time = msg_time_node.textContent;
                         const mregex = /^20(\d{2})-(\d{2})-(\d{2})T(.+):.+Z/i;
                         delmsg_time = msg_time_text.replace(mregex, '$4 $3/$2/$1');
@@ -496,45 +490,13 @@
                 }
             });
         });
-
-        function getUsername(node, asNode = false) {
-            const usernameNode = [...node.querySelectorAll('[class*="username-"]')].find(el => el.closest(`[id^='message-reply-context']`) === null) ?? null;
-            if(!usernameNode){
-                return null;
-            }
-            return asNode ? usernameNode : usernameNode.textContent;
-        }
-
-        /**
-         * Return true only if this delete refers to a removed message initiated by a user
-         * @param node
-         * @returns {boolean}
-         */
-        function isChatDelete(node) {
-            // ensure we-wrapped message element (li -> div) when clicked on a reply link is removed
-            const messageId = node.id.split("-").pop();
-            const messageContent = document.querySelector(`#message-content-${messageId}`);
-            if (messageContent) {
-                // ignore modals
-                const popup = messageContent?.closest(`[class^="focusLock"]`) ?? null;
-                if (!popup) {
-                    return false;
-                }
-            }
-            // ignore div tags removed from uploads finished
-            if (node.querySelector(`[class^="progressContainer"]`) !== null) {
-                return false;
-            }
-            return true;
-        }
-
     }
 
     function init(observerInit) {
         savedeletedWindow = createElm(savedeletedTemplate);
         document.body.appendChild(savedeletedWindow);
-        new Drag(savedeletedWindow, savedeletedWindow.querySelector('.header'), {mode: 'move'});
-        new Drag(savedeletedWindow, savedeletedWindow.querySelector('.resizer'), {mode: 'resize'});
+        new Drag(savedeletedWindow, savedeletedWindow.querySelector('.header'), { mode: 'move' });
+        new Drag(savedeletedWindow, savedeletedWindow.querySelector('.resizer'), { mode: 'resize' });
         savedeletedWindow.querySelector("#savedeletedCloseBtn").onclick = toggleWindow;
 
 
